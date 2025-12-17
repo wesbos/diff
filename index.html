@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Diff Challenge</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="attempts.css" />
+    <script type="module" src="./scripts.ts"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>CSS Diff</h1>
+        <p class="tagline">Match the target box as closely as possible</p>
+      </header>
+
+      <main class="main">
+        <section class="boxes">
+          <div class="box-container">
+            <h3 class="box-label">Your CSS</h3>
+            <div class="box-wrapper">
+              <div class="contestant box" id="contestant">
+                <button>
+                  <span class="text">Buy Now!</span>
+                  <span class="price">$100</span>
+                </button>
+                <span class="tooltip">SALE!</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-container">
+            <h3 class="box-label">Target</h3>
+            <div class="box-wrapper">
+              <div class="target box" id="target">
+                <button>
+                  <span class="text">Buy Now!</span>
+                  <span class="price">$100</span>
+                </button>
+                <span class="tooltip">SALE!</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="results">
+          <div class="scores-grid">
+            <div class="score-display">
+              <span class="score-value" id="pixel-score">--</span>
+              <span class="score-label">Pixel Match</span>
+            </div>
+            <div class="score-display">
+              <span class="score-value" id="ssim-score">--</span>
+              <span class="score-label">SSIM</span>
+            </div>
+            <div class="score-display">
+              <span class="score-value" id="ai-score">--</span>
+              <span class="score-label">AI Vision</span>
+              <span class="score-status" id="ai-status">Loading model...</span>
+            </div>
+          </div>
+          <button class="compare-btn" id="compare-btn">Compare</button>
+        </section>
+
+        <div class="diff-item diff-result">
+          <span class="diff-label">Difference</span>
+          <div class="diff-canvas-wrapper" id="diff-preview"></div>
+          <div class="severity-scale">
+            <span>MINOR</span>
+            <span class="severity"></span>
+            <span>MAJOR</span>
+          </div>
+        </div>
+
+        <section class="diff-view">
+          <h3>Visual Diff</h3>
+          <div class="diff-grid">
+            <div class="diff-item">
+              <span class="diff-label">Your CSS</span>
+              <div class="diff-canvas-wrapper" id="contestant-preview"></div>
+            </div>
+            <div class="diff-item">
+              <span class="diff-label">Target</span>
+              <div class="diff-canvas-wrapper" id="target-preview"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <style></style>
+  </body>
+</html>

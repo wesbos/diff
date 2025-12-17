@@ -1,0 +1,76 @@
+/* Contestant styles - edit these to match target! */
+/* .contestant {
+        background: #3498db;
+        border-radius: 8px;
+      }
+
+      .contestant h2 {
+        color: white;
+        font-family: sans-serif;
+      } */
+
+/* Target styles - try to match these */
+.box {
+  border-radius: 16px;
+}
+
+.box h2 {
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.contestant,
+.target {
+  button {
+    background: #000;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px 5px 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 25px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    position: relative;
+    anchor-name: --anchor-el;
+    border-radius: 500px;
+
+    .price {
+      border-radius: 500px;
+      background: white;
+      color: black;
+      font-weight: bold;
+      padding: 5px 10px;
+    }
+  }
+  .tooltip {
+    position: absolute;
+    position-anchor: --anchor-el;
+    justify-self: anchor-center;
+    top: calc(anchor(top) - anchor-size(height) / 2);
+    rotate: -3deg;
+    background: orange;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 500px;
+    font-size: 15px;
+  }
+}
+
+.contestant {
+  button {
+    /* padding: 15px; */
+    /* box-shadow: 0 0 10px 0 rgba(0, 255, 170, 0.5); */
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 1);
+    /* background: #1f1f1f; */
+  }
+  .tooltip {
+    /* background: #ffc600; */
+    /* rotate: -15deg; */
+    /* left: 150px; */
+    /* justify-self: unset; */
+  }
+}
