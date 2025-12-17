@@ -1,50 +1,16 @@
 import { snapdom } from "@zumer/snapdom";
-import { ssim } from "ssim.js";
-import { pipeline, cos_sim } from "@huggingface/transformers";
-import type { ImageFeatureExtractionPipeline } from "@huggingface/transformers";
 import { hslToRgb } from "./utils";
 
 const contestantEl = document.getElementById("contestant") as HTMLElement;
 const targetEl = document.getElementById("target") as HTMLElement;
 const compareBtn = document.getElementById("compare-btn") as HTMLButtonElement;
 const pixelScoreEl = document.getElementById("pixel-score") as HTMLElement;
-const ssimScoreEl = document.getElementById("ssim-score") as HTMLElement;
-const aiScoreEl = document.getElementById("ai-score") as HTMLElement;
-const aiStatusEl = document.getElementById("ai-status") as HTMLElement;
 const contestantPreview = document.getElementById(
   "contestant-preview"
 ) as HTMLElement;
 const targetPreview = document.getElementById("target-preview") as HTMLElement;
 const diffPreview = document.getElementById("diff-preview") as HTMLElement;
 
-// AI Vision model (loaded lazily)
-let imageExtractor: ImageFeatureExtractionPipeline | null = null;
-let modelLoading = false;
-let modelReady = false;
-
-async function loadModel() {
-  if (modelLoading || modelReady) return;
-  modelLoading = true;
-
-  try {
-    aiStatusEl.textContent = "Loading model...";
-    // @ts-expect-error - pipeline returns a complex union type
-    imageExtractor = await pipeline(
-      "image-feature-extraction",
-      "Xenova/vit-base-patch16-224-in21k"
-    );
-    modelReady = true;
-    aiStatusEl.textContent = "";
-  } catch (error) {
-    console.error("Failed to load AI model:", error);
-    aiStatusEl.textContent = "Model failed to load";
-  } finally {
-    modelLoading = false;
-  }
-}
-
-// Start loading model immediately
-loadModel();
 
 function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -55,47 +21,6 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   });
 }
 
-async function calculateAISimilarity(
-  canvas1: HTMLCanvasElement,
-  canvas2: HTMLCanvasElement
-): Promise<number | null> {
-  if (!imageExtractor || !modelReady) return null;
-
-  try {
-    // Convert canvases to blobs, then to object URLs for the model
-    const [blob1, blob2] = await Promise.all([
-      canvasToBlob(canvas1),
-      canvasToBlob(canvas2),
-    ]);
-
-    const url1 = URL.createObjectURL(blob1);
-    const url2 = URL.createObjectURL(blob2);
-
-    try {
-      // Extract features with mean pooling to get a single vector per image
-      const [features1, features2] = await Promise.all([
-        imageExtractor(url1, { pooling: "mean" } as any),
-        imageExtractor(url2, { pooling: "mean" } as any),
-      ]);
-
-      // Get embeddings as arrays
-      const embedding1 = Array.from(features1.data as Float32Array);
-      const embedding2 = Array.from(features2.data as Float32Array);
-
-      // Calculate cosine similarity
-      const similarity = cos_sim(embedding1, embedding2);
-
-      // Convert to percentage (0-100)
-      return Math.max(0, similarity) * 100;
-    } finally {
-      URL.revokeObjectURL(url1);
-      URL.revokeObjectURL(url2);
-    }
-  } catch (error) {
-    console.error("AI similarity calculation failed:", error);
-    return null;
-  }
-}
 
 interface ImageData {
   data: Uint8ClampedArray;
@@ -252,35 +177,6 @@ function updateScoreDisplay(element: HTMLElement, score: number) {
   }
 }
 
-function calculateSSIM(
-  canvas1: HTMLCanvasElement,
-  canvas2: HTMLCanvasElement
-): number {
-  // SSIM requires same dimensions, so we'll use the larger of the two
-  const width = Math.max(canvas1.width, canvas2.width);
-  const height = Math.max(canvas1.height, canvas2.height);
-
-  // Create normalized canvases with same dimensions
-  const normalizedCanvas1 = document.createElement("canvas");
-  const normalizedCanvas2 = document.createElement("canvas");
-  normalizedCanvas1.width = normalizedCanvas2.width = width;
-  normalizedCanvas1.height = normalizedCanvas2.height = height;
-
-  const nCtx1 = normalizedCanvas1.getContext("2d")!;
-  const nCtx2 = normalizedCanvas2.getContext("2d")!;
-
-  // Draw originals
-  nCtx1.drawImage(canvas1, 0, 0);
-  nCtx2.drawImage(canvas2, 0, 0);
-
-  const imageData1 = nCtx1.getImageData(0, 0, width, height);
-  const imageData2 = nCtx2.getImageData(0, 0, width, height);
-
-  // Calculate SSIM on masked images
-  const result = ssim(imageData1, imageData2);
-
-  return result.mssim * 100; // Convert to percentage
-}
 
 function clearPreview(element: HTMLElement) {
   element.innerHTML = "";
@@ -314,8 +210,6 @@ async function compare() {
       targetData
     );
 
-    // Compare with SSIM
-    const ssimScore = calculateSSIM(contestantCanvas, targetCanvas);
 
     // Compare with AI Vision (if model is ready)
     // const aiScore = await calculateAISimilarity(contestantCanvas, targetCanvas);
@@ -331,7 +225,7 @@ async function compare() {
 
     // Update all scores
     updateScoreDisplay(pixelScoreEl, pixelScore);
-    updateScoreDisplay(ssimScoreEl, ssimScore);
+
     // if (aiScore !== null) {
     //   updateScoreDisplay(aiScoreEl, aiScore);
     // }
