@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Diff Challenge</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="attempts3.css" />
+    <script type="module" src="./scripts.ts"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>CSS Diff</h1>
+      </header>
+
+      <main class="main">
+        <section class="boxes">
+          <div class="box-container">
+            <h3 class="box-label">Your CSS</h3>
+            <div class="box-wrapper">
+              <div class="contestant box" id="contestant">
+                <div class="win98popup shadow">
+                  <div class="bar">
+                    <p>Paint</p>
+                    <button class="shadow">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="8px"
+                        height="7px"
+                        viewBox="0 0 8 7"
+                        fill-rule="evenodd"
+                        stroke-linejoin="round"
+                        stroke-miterlimit="2"
+                      >
+                        <path
+                          d="M1 6V5h1V4h1V3h2v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1zm0-4V1H0V0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H2V2H1z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <section>
+                    <p>Save changes to untitled?</p>
+                  </section>
+                  <div class="buttons">
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p><u>Y</u>es</p>
+                    </button>
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p><u>N</u>o</p>
+                    </button>
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p>Cancel</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-container">
+            <h3 class="box-label">Target</h3>
+            <div class="box-wrapper">
+              <div class="target box" id="target">
+                <div class="win98popup shadow">
+                  <div class="bar">
+                    <p>Paint</p>
+                    <button class="shadow">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="8px"
+                        height="7px"
+                        viewBox="0 0 8 7"
+                        fill-rule="evenodd"
+                        stroke-linejoin="round"
+                        stroke-miterlimit="2"
+                      >
+                        <path
+                          d="M1 6V5h1V4h1V3h2v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1zm0-4V1H0V0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H2V2H1z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <section>
+                    <p>Save changes to untitled?</p>
+                  </section>
+                  <div class="buttons">
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p><u>Y</u>es</p>
+                    </button>
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p><u>N</u>o</p>
+                    </button>
+                    <button class="shadow">
+                      <img
+                        src="https://raw.githubusercontent.com/mbledkowski/win98popup/master/outline.svg"
+                        alt=""
+                        width="66.9"
+                        height="15"
+                      />
+                      <p>Cancel</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="results">
+          <div class="score-display"></div>
+        </section>
+
+        <div class="diff-item diff-result">
+          <span class="diff-label">Difference</span>
+          <div class="diff-canvas-wrapper" id="diff-preview"></div>
+          <div class="severity-scale">
+            <span class="score-value" id="pixel-score">--</span>
+            <span>MINOR</span>
+            <span class="severity"></span>
+            <span>MAJOR</span>
+          </div>
+        </div>
+
+        <section class="diff-view">
+          <h3>Visual Diff</h3>
+          <div class="diff-grid">
+            <div class="diff-item">
+              <span class="diff-label">Your CSS</span>
+              <div class="diff-canvas-wrapper" id="contestant-preview"></div>
+            </div>
+            <div class="diff-item">
+              <span class="diff-label">Target</span>
+              <div class="diff-canvas-wrapper" id="target-preview"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <style></style>
+  </body>
+</html>

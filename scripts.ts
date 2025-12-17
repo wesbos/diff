@@ -12,15 +12,6 @@ const targetPreview = document.getElementById("target-preview") as HTMLElement;
 const diffPreview = document.getElementById("diff-preview") as HTMLElement;
 
 
-function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("Failed to convert canvas to blob"));
-    }, "image/png");
-  });
-}
-
 
 interface ImageData {
   data: Uint8ClampedArray;
@@ -237,7 +228,7 @@ async function compare() {
 }
 
 // Event listeners
-compareBtn.addEventListener("click", compare);
+// compareBtn.addEventListener("click", compare);
 
 // Run comparison every 1 second
 setInterval(compare, 400);

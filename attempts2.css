@@ -1,0 +1,155 @@
+.box {
+  height: 250px;
+  background-color: #000;
+  border: 0;
+  font-size: 15px;
+}
+
+:root {
+  --color: #a972cb;
+  --color-fill: #a972cb;
+  --color-pulse: #ef6eae;
+  --color-close: #ff7f82;
+  --color-raise: #ffa260;
+  --color-up: #e4cb58;
+  --color-slide: #8fc866;
+  --color-offset: #19bc8b;
+}
+.target {
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  .buttons {
+    gap: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    color: var(--color);
+    transition: 0.25s;
+    background: none;
+    border: 2px solid;
+    font: inherit;
+    line-height: 1;
+    padding: 10px 20px;
+    &:hover,
+    &:focus {
+      border-color: var(--hover);
+      color: #fff;
+    }
+    &:nth-child(1) {
+      --color: var(--color-fill);
+    }
+    &:nth-child(2) {
+      --color: var(--color-pulse);
+    }
+    &:nth-child(3) {
+      --color: var(--color-close);
+    }
+    &:nth-child(4) {
+      --color: var(--color-raise);
+    }
+    &:nth-child(5) {
+      --color: var(--color-up);
+    }
+    &:nth-child(6) {
+      --color: var(--color-slide);
+    }
+    &:nth-child(7) {
+      --color: var(--color-offset);
+    }
+  }
+  .fill:hover,
+  .fill:focus {
+    box-shadow: inset 0 0 0 2em var(--hover);
+  }
+
+  /* Animate the size, outside */
+  .pulse:hover,
+  .pulse:focus {
+    animation: pulse 1s;
+    box-shadow: 0 0 0 2em transparent;
+  }
+
+  /* Stack multiple shadows, one from the left, the other from the right */
+  .close:hover,
+  .close:focus {
+    box-shadow: inset -3.5em 0 0 0 var(--hover), inset 3.5em 0 0 0 var(--hover);
+  }
+
+  /* Size can also be negative; see how it's smaller than the element */
+  .raise:hover,
+  .raise:focus {
+    box-shadow: 0 0.5em 0.5em -0.4em var(--hover);
+    transform: translateY(-0.25em);
+  }
+
+  /* Animating from the bottom */
+  .up {
+    border-radius: 500px;
+  }
+  .up:hover,
+  .up:focus {
+    box-shadow: inset 0 -3.25em 0 0 var(--hover);
+  }
+
+  /* And from the left */
+  .slide:hover,
+  .slide:focus {
+    box-shadow: inset 6.5em 0 0 0 var(--hover);
+  }
+
+  /* Multiple shadows, one on the outside, another on the inside */
+  .offset {
+    box-shadow: 0.3em 0.3em 0 0 var(--color), inset 0.3em 0.3em 0 0 var(--color);
+
+    &:hover,
+    &:focus {
+      box-shadow: 0 0 0 0 var(--hover), inset 6em 3.5em 0 0 var(--hover);
+    }
+  }
+}
+
+.contestant {
+  text-align: center;
+  align-content: center;
+  .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  button {
+    font-size: inherit;
+    padding: 10px 20px;
+    background: none;
+    font-size: 15px;
+    border: 2px solid var(--color);
+    color: var(--color);
+    letter-spacing: 1px;
+    &:nth-child(1) {
+      --color: var(--color-fill);
+    }
+    &:nth-child(2) {
+      --color: var(--color-pulse);
+    }
+    &:nth-child(3) {
+      --color: var(--color-close);
+    }
+    &:nth-child(4) {
+      --color: var(--color-raise);
+    }
+    &:nth-child(5) {
+      --color: var(--color-up);
+    }
+    &:nth-child(6) {
+      --color: var(--color-slide);
+    }
+    &:nth-child(7) {
+      --color: var(--color-offset);
+    }
+  }
+}
