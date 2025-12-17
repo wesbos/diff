@@ -132,38 +132,20 @@ function getImageData(canvas: HTMLCanvasElement): ImageData {
   };
 }
 
-// // Check if a pixel is "background" (transparent or white/near-white)
-// function isBackground(r: number, g: number, b: number, a: number): boolean {
-//   // Transparent pixels are background
-//   if (a < 10) return true;
-
-//   // White or near-white pixels are background (threshold: 250)
-//   if (r > 250 && g > 250 && b > 250) return true;
-
-//   return false;
-// }
-
 function compareImages(
   img1Data: ImageData,
   img2Data: ImageData
 ): { score: number; diffCanvas: HTMLCanvasElement } {
-  // Create a canvas for the diff visualization
   const width = Math.max(img1Data.width, img2Data.width);
   const height = Math.max(img1Data.height, img2Data.height);
-  let highestDiff;
-  let lowestDiff;
-  const diffCanvas = document.createElement("canvas");
-  diffCanvas.width = width;
-  diffCanvas.height = height;
-  const diffCtx = diffCanvas.getContext("2d")!;
-  const diffImageData = diffCtx.createImageData(width, height);
+  const totalPixels = width * height;
 
-  let totalDiff = 0;
-  let contentPixels = 0; // Only count pixels with actual content
+  // First pass: calculate all pixel diffs
+  const pixelDiffs = new Float32Array(totalPixels);
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const i = (y * width + x) * 4;
+      const idx = y * width + x;
 
       // Get pixel from image 1 (or transparent if out of bounds)
       let r1 = 0,
@@ -191,22 +173,6 @@ function compareImages(
         a2 = img2Data.data[i2 + 3];
       }
 
-      // // Check if both pixels are background - skip these entirely
-      // const isBg1 = isBackground(r1, g1, b1, a1);
-      // const isBg2 = isBackground(r2, g2, b2, a2);
-
-      // if (isBg1 && isBg2) {
-      //   // Both are background - show as dark in diff, don't count
-      //   diffImageData.data[i] = 15;
-      //   diffImageData.data[i + 1] = 15;
-      //   diffImageData.data[i + 2] = 20;
-      //   diffImageData.data[i + 3] = 255;
-      //   continue;
-      // }
-
-      // At least one has content - this pixel counts
-      contentPixels++;
-
       // Calculate difference
       const rDiff = Math.abs(r1 - r2);
       const gDiff = Math.abs(g1 - g2);
@@ -214,78 +180,60 @@ function compareImages(
       const aDiff = Math.abs(a1 - a2);
 
       // Weighted difference (human eye is more sensitive to green)
-      // Weights: 0.299 + 0.587 + 0.114 + 0.2 = 1.2, so divide by 255 * 1.2 to normalize to [0, 1]
+      // Weights: 0.299 + 0.587 + 0.114 + 0.1 = 1.1, so divide by 255 * 1.1 to normalize to [0, 1]
+      // Weight alpha very low so shadows are ignored
       const pixelDiff =
         (rDiff * 0.299 + gDiff * 0.587 + bDiff * 0.114 + aDiff * 0.1) /
         (255 * 1.1);
-      // const pixelDiff = (rDiff * 0.33 + gDiff * 0.33 + bDiff * 0.33 + aDiff * 0.01) / 255;
-      const alphaDiffCutoff = 100;
 
-      // Alpha Diff less than 100 is likely a small shadow difference and should be ignored
-      // if(aDiff > 0 && aDiff < alphaDiffCutoff) {
-      //   // Pink Pixels are Different, but skipped from counting towards the score
-      //   diffImageData.data[i] = 251;
-      //   diffImageData.data[i + 1] = 0;
-      //   diffImageData.data[i + 2] = 255;
-      //   diffImageData.data[i + 3] = 45;
-      //   continue;
-      // }
-
-      // TODO: We should check if this diff pixel is extremely small and skip it if so. We can calculate this from neighboring pixels.
-
-      // Add to total difference
-      totalDiff += pixelDiff;
-
-      if(pixelDiff < 0.01) {
-        continue;
-      }
-
-      const showScaleDiff = true;
-      if (showScaleDiff) {
-        highestDiff = Math.max(highestDiff || 0, pixelDiff);
-        lowestDiff = Math.min(lowestDiff || Infinity, pixelDiff);
-        const hsl = hslToRgb((1 - pixelDiff) * 0.7, 1, 0.5);
-        diffImageData.data[i] = hsl[0];
-        diffImageData.data[i + 1] = hsl[1];
-        diffImageData.data[i + 2] = hsl[2];
-        diffImageData.data[i + 3] = 255;
-        continue;
-      }
-
-      if (pixelDiff < 0.01) {
-        // Nearly identical - show as green/teal (matching content!)
-        // diffImageData.data[i] = 0;
-        // diffImageData.data[i + 1] = 180;
-        // diffImageData.data[i + 2] = 140;
-        // diffImageData.data[i + 3] = 255;
-      } else if (pixelDiff < 0.1) {
-        // Small difference - yellow
-        diffImageData.data[i] = 255;
-        diffImageData.data[i + 1] = 200;
-        diffImageData.data[i + 2] = 0;
-        diffImageData.data[i + 3] = Math.min(255, 100 + pixelDiff * 1550);
-      } else {
-        // Large difference - red/magenta
-        const intensity = Math.min(255, pixelDiff * 255 * 2);
-        diffImageData.data[i] = 255;
-        diffImageData.data[i + 1] = 50;
-        diffImageData.data[i + 2] = 100;
-        diffImageData.data[i + 3] = intensity;
-      }
+      pixelDiffs[idx] = pixelDiff;
     }
   }
 
-  console.log({ highestDiff, lowestDiff });
+  // Calc total diff
+  let totalDiff = 0;
+
+  for (let i = 0; i < totalPixels; i++) {
+    const diff = pixelDiffs[i];
+    // Ignore very small diffs - close colors or alpha differences
+    if(diff && diff < 0.005) {
+      console.log(diff);
+      continue;
+    }
+    totalDiff += diff;
+  }
+
+  // Third pass: paint the diff canvas
+  const diffCanvas = document.createElement("canvas");
+  diffCanvas.width = width;
+  diffCanvas.height = height;
+  const diffCtx = diffCanvas.getContext("2d")!;
+  const diffImageData = diffCtx.createImageData(width, height);
+
+  for (let i = 0; i < totalPixels; i++) {
+    const pixelDiff = pixelDiffs[i];
+    const rgbaIdx = i * 4;
+
+    if (pixelDiff < 0.01) {
+      // Nearly identical - leave transparent
+      continue;
+    }
+
+    const hsl = hslToRgb((1 - pixelDiff) * 0.7, 1, 0.5);
+    diffImageData.data[rgbaIdx] = hsl[0];
+    diffImageData.data[rgbaIdx + 1] = hsl[1];
+    diffImageData.data[rgbaIdx + 2] = hsl[2];
+    diffImageData.data[rgbaIdx + 3] = 255;
+  }
 
   diffCtx.putImageData(diffImageData, 0, 0);
 
-  // Calculate similarity score (0-100) based only on content pixels
-  // If no content pixels found, return 0
-  if (contentPixels === 0) {
+  // Calculate similarity score (0-100)
+  if (totalPixels === 0) {
     return { score: 0, diffCanvas };
   }
 
-  const avgDiff = totalDiff / contentPixels;
+  const avgDiff = totalDiff / totalPixels;
   const score = Math.max(0, Math.min(100, (1 - avgDiff) * 100));
 
   return { score, diffCanvas };
@@ -327,31 +275,6 @@ function calculateSSIM(
 
   const imageData1 = nCtx1.getImageData(0, 0, width, height);
   const imageData2 = nCtx2.getImageData(0, 0, width, height);
-
-  // // Mask out background pixels in both images
-  // // Set them to the same neutral value so they don't affect SSIM
-  // for (let i = 0; i < imageData1.data.length; i += 4) {
-  //   const r1 = imageData1.data[i];
-  //   const g1 = imageData1.data[i + 1];
-  //   const b1 = imageData1.data[i + 2];
-  //   const a1 = imageData1.data[i + 3];
-
-  //   const r2 = imageData2.data[i];
-  //   const g2 = imageData2.data[i + 1];
-  //   const b2 = imageData2.data[i + 2];
-  //   const a2 = imageData2.data[i + 3];
-
-  //   const isBg1 = isBackground(r1, g1, b1, a1);
-  //   const isBg2 = isBackground(r2, g2, b2, a2);
-
-  //   // If both are background, set to transparent
-  //   if (isBg1 && isBg2) {
-  //     imageData1.data[i] = imageData2.data[i] = 128;
-  //     imageData1.data[i + 1] = imageData2.data[i + 1] = 128;
-  //     imageData1.data[i + 2] = imageData2.data[i + 2] = 128;
-  //     imageData1.data[i + 3] = imageData2.data[i + 3] = 255;
-  //   }
-  // }
 
   // Calculate SSIM on masked images
   const result = ssim(imageData1, imageData2);
